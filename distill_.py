@@ -1,10 +1,11 @@
 from datasets import Dataset, load_dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from trl.experimental.gkd import GKDConfig, GKDTrainer
+from trl.experimental.gold import GOLDConfig, GOLDTrainer
 
-# Step 1: pick the tokenizer for both teacher and student
-# （步骤1：选择教师和学生共享的tokenizer）
-tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-Math-PRM-7B")
+# Step 1: pick tokenizers separately so the student keeps its own vocab/embedding size
+# （步骤1：分别加载教师和学生的tokenizer，避免学生的embedding尺寸被改动）
+student_tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B-Instruct")
+teacher_tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-Math-PRM-7B")
 
 # Step 2: load teacher and student models
 # （步骤2：加载教师模型和学生模型）
@@ -21,8 +22,8 @@ shuffled_dataset = raw_dataset.shuffle(seed=42)
 train_raw = shuffled_dataset.select(range(2000))
 eval_raw = shuffled_dataset.select(range(2000, 2200))
 
-# Step 5: map every sample into chat messages that GKD expects
-# （步骤5：把样本整理成GKD需要的messages格式）
+# Step 5: map every sample into chat messages that GOLD expects
+# （步骤5：把样本整理成GOLD需要的messages格式）
 def to_messages(example):
     # 优先使用已经存在的messages字段
     if "messages" in example and example["messages"]:
@@ -48,20 +49,26 @@ def to_messages(example):
 train_dataset = train_raw.map(to_messages, remove_columns=train_raw.column_names)
 eval_dataset = eval_raw.map(to_messages, remove_columns=eval_raw.column_names)
 
-# Step 6: set up trainer configuration
-# （步骤6：配置训练参数）
-training_args = GKDConfig(output_dir="gkd-model", per_device_train_batch_size=1)
-trainer = GKDTrainer(
+# Step 6: set up trainer configuration (enable ULD for tokenizer/vocab mismatch)
+training_args = GOLDConfig(
+    output_dir="gkd-model",
+    per_device_train_batch_size=1,
+    use_uld_loss=True,
+    teacher_tokenizer_name_or_path="Qwen/Qwen2.5-Math-PRM-7B"
+)
+
+trainer = GOLDTrainer(
     model=model,
     teacher_model=teacher_model,
     args=training_args,
-    processing_class=tokenizer,
+    processing_class=student_tokenizer,
     train_dataset=train_dataset,
     eval_dataset=eval_dataset,
 )
+
 
 # Step 7: train and then save the student weights
 # （步骤7：开始训练，并在结束后保存学生模型权重）
 trainer.train()
 model.save_pretrained("student-model")
-tokenizer.save_pretrained("student-model")
+student_tokenizer.save_pretrained("student-model")

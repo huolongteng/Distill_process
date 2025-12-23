@@ -11,28 +11,38 @@
     "Total samples": 1319,
     "Accuracy": 0.2487
   },
-    {
-        "model": "unsloth/Qwen2.5-Math-7B-Instruct",
-        "eval_dataset": "openai/gsm8k",
-        "Total samples": 1319,
-        "Accuracy": 0.4102
-    },
-    {
-        "model": "Qwen/Qwen2.5-Math-7B-PRM800K",
-        "eval_dataset": "openai/gsm8k",
-        "Total samples": 1319,
-        "Accuracy": 0.42
-    },
   {
-        "model": "Qwen/Qwen2.5-Math-PRM-7B",
-        "eval_dataset": "openai/gsm8k",
-        "Total samples": 1319,
-        "Accuracy": 0.4405
-    },
-    {
-        "model": "Qwen/Qwen2.5-0.5B-Instruct",
-        "eval_dataset": "openai/gsm8k",
-        "Total samples": 1319,
-        "Accuracy": 0.0387
-    }
+    "model": "unsloth/Qwen2.5-Math-7B-Instruct",
+    "eval_dataset": "openai/gsm8k",
+    "Total samples": 1319,
+    "Accuracy": 0.4102
+  },
+  {
+    "model": "Qwen/Qwen2.5-Math-7B-PRM800K",
+    "eval_dataset": "openai/gsm8k",
+    "Total samples": 1319,
+    "Accuracy": 0.42
+  },
+{
+    "model": "Qwen/Qwen2.5-Math-PRM-7B",
+    "eval_dataset": "openai/gsm8k",
+    "Total samples": 1319,
+    "Accuracy": 0.4405
+  },
+  {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "eval_dataset": "openai/gsm8k",
+    "Total samples": 1319,
+    "Accuracy": 0.0387
+  },
+  {
+    "model": "open-thoughts/OpenThinker3-7B",
+    "task": "mmlu",
+    "Accuracy": 0.4548
+  },
+  {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "task": "mmlu",
+    "Accuracy": 0.4584
+  }
 ]
